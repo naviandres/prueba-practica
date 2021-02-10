@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+ 	<meta charset="utf-8">
+ 	<title>Registro</title>
+ 	<script src="https://code.jquery.com/jquery-3.5.0.min.js"></script> 	
+ 	<style>
+ 		div{
+ 			margin:auto;
+ 			width:70%;
+ 			padding:35px;
+ 			background-color: #ececec;
+ 		}
+ 		input{
+ 			width: 98%;
+ 			 padding: 6px 5px;
+ 			margin:5px 0px;
+ 		}
+ 		.btn{ 		
+ 			width: 30%;
+ 			 margin-right: 0;	
+ 			 display:block;	
+ 			  margin-left:auto;
+ 		}
+ 	</style>
+</head>
+<body>
+	<center>
+		<h1>Registro de usuario</h1>
+	</center>
+	<form action="/users-rest" method="post" id="formCrear">
+		 <div>
+			<label for="nombre">Nombre</label> 
+			<input type="text" id="nombre" name="nombre" placeholder="Nombre"> 
+			<span></span> 
+			<label for="apellido">Apellido</label>
+			<input type="text" id="apellido" name="apellido" placeholder="Apellido">
+			<input type="hidden" id="procesar" name="procesar" value="false">
+			<span></span>
+			<input type="submit" class="btn" value="Registrar">
+			<a href="/">Regresar</a>
+		</div>
+	
+	</form>
+	<script>
+	
+	//al detectar el evento submit realiza peticion post 
+	$("#formCrear").submit(function(e) {
+		e.preventDefault();
+	    var form = $(this);
+	    var url = form.attr('action');
+	    
+	    $.ajax({
+	           type: "POST",
+	           url: url,
+	           data: form.serialize(),
+	           success: function(respuesta){
+	               alert('Usuario registrado con exito.');
+	               location.reload();
+	           },
+			   error : function(xhr, status) {
+			        alert('Error al registrar usuario.');
+			    }
+	         });	   
+	});
+	</script>
+</body>
+</html>

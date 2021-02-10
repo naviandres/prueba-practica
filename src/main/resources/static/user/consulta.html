@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<title>Consulta</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
+<style>
+table.datatable {
+	width: 100%;
+	background: #fff;
+}
+
+table.datatable td {
+	font-size: 10pt;
+	padding: 5px 10px;
+	border-bottom: 1px solid #ddd;
+	text-align: left;
+}
+
+table.datatable th {
+	text-align: left;
+	font-size: 8pt;
+	padding: 10px 10px 7px;
+	text-transform: uppercase;
+	background-color: #ececec;
+	font-family: sans-serif;
+}
+
+.selected {
+	background-color: #84e4f775;
+}
+
+.btn {
+	float: right;
+	background-color: #a9f576ab;
+}
+</style>
+</head>
+<body>
+	<center>
+		<h1>Usuarios</h1>
+	</center>
+	<div>
+		<table id="table" class="datatable">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Nombre</th>
+					<th>Apellido</th>
+					<th>Procesado</th>
+				</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</div>
+	<div>
+		<button id="procesar" class="btn">Procesar</button>
+		<a href="/">Regresar</a>
+	</div>
+	<script>
+		//llama rest con todos los usuarios
+		$(document).ready(function() {
+			$.ajax({
+				url : '/users-rest',
+				type : 'GET',
+				contentType : 'application/json; charset=utf-8',
+				success : function(json) {
+					//console.log(json)
+					//crea contenido de la tabla con json obtenido
+					var columns = Object.keys(json[0]);
+					for (var i = 0; i < json.length; i++) {
+						var row = $('<tr/>');
+						for (var j = 0; j < columns.length; j++) {
+							var value = json[i][columns[j]];
+							if (typeof value === 'boolean') {
+								value = value.toString();
+							}
+							row.append($('<td/>').html(value));
+						}
+						$('#table').append(row);
+					}
+				}
+			});
+		});
+
+		//al dar click sobre fila cambia estilo
+		$('#table tbody').on('click', 'tr', function() {
+			$(this).toggleClass('selected');
+		});
+
+		$('#procesar')
+				.click(
+						function() {
+							var selectedIDs = [];
+							//busca y guarda en array la primer columna de todas las filas seleccionadas
+							$('#table tr.selected').each(
+									function(index, row) {
+										selectedIDs.push($(row)
+												.find('td:first').html());
+									});
+							if (selectedIDs.length != 0) {
+								var jsonIDs = JSON.stringify(selectedIDs);
+								//realiza peticion rest para actualizar procesar
+								$
+										.ajax({
+											url : '/users-rest',
+											type : 'PUT',
+											contentType : 'application/json; charset=utf-8',
+											data : jsonIDs,
+											success : function(respuesta) {
+												location.reload();
+											},
+											error : function(xhr, status) {
+										        alert('Error al actualizar registros.');
+										    }
+										});
+							} else {
+								alert('Por favor seleccione al menos un registro antes de procesar.');
+							}
+
+						});
+	</script>
+</body>
+
+</html>
